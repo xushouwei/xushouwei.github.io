@@ -1,0 +1,212 @@
+ 
+<!doctype html> 
+<html> 
+<head> 
+<meta charset="UTF-8">
+<title>canvas简单画板</title> 
+<style type="text/css"> 
+#can{ width:600px; height:500px; border:1px solid #ccc; margin-top:0px; margin-left:20px;} 
+</style> 
+</head> 
+<body> 
+<h2 style="padding-left:20px">canvas简单画板</h2> 
+<canvas id="can" width="600" height="500"></canvas> 
+<script type="text/javascript"> 
+
+	var historyData = {};    //历史数据,格式: {color:'#000000',coordinate:{'1-1','2-2','3-3','4-4'}};
+	
+
+	function getBodyOffsetTop(el){ 
+		var top = 0; 
+		do{ 
+			top = top + el.offsetTop; 
+		}while(el = el.offsetParent); 
+		return top; 
+	} 
+	function getBodyOffsetLeft(el){ 
+		var left = 0; 
+		do{ 
+			left = left + el.offsetLeft; 
+		}while(el = el.offsetParent); 
+		return left; 
+	} 
+	function Drawing(canvas,options){ 
+		typeof canvas == 'string' && (canvas = document.getElementById(canvas)); 
+		if(!canvas || !canvas.getContext){ 
+			throw new Error(100,'do not support canvas!'); 
+		} 
+		this.option = { 
+			colors:['#000000','#ff0000','#00ff00','#0000ff','#00ffff','#7fef02','#4488bb']  //颜色
+		}; 
+		this.setOption(options); 
+		this.init(canvas); 
+	} 
+	Drawing.prototype = { 
+		setOption:function(options){ 
+			console.log("----setOption----");
+			typeof options == 'object' || (options = {}); 
+			for(var i in options){ 
+				switch(i){ 
+					case 'colors': 
+					this.option[i] = options[i]; 
+					break; 
+				} 
+			} 
+		}, 
+		init:function(canvas){ 
+			console.log("----init----");
+			this.canvas = canvas; 
+			this.context = canvas.getContext('2d'); 
+			this.context.lineWidth = 1; 
+			this.context.lineJons = 'round'; 
+			this.context.lineCep = 'round'; 
+			this.isButtonDown = false; 
+			this.historyStroker = []; 
+			this.curStroker = {color:'#000000',path:[]}; 
+			this.lastX = 0; 
+			this.lastY = 0; 
+			this.curColor = '#000000'; 
+			this.toolbarspos ={}; 
+			this.bindEvent(); 
+			this.ResetDrawToolbar(); 
+		}, 
+		bindEvent:function(){ 
+			console.log("----bindEvent----");
+			var self = this; 
+			this.canvas.addEventListener('mousemove',function(event){ 
+				var x = event.pageX-getBodyOffsetLeft(this), 
+				y = event.pageY-getBodyOffsetTop(this); 
+				self.onMouseMove({x:x,y:y}); 
+			},false); 
+			this.canvas.addEventListener('mousedown',function(event){ 
+				var x = event.pageX-getBodyOffsetLeft(this), 
+				y = event.pageY-getBodyOffsetTop(this); 
+				self.onMouseDown(event,{x:x,y:y}); 
+			},false); 
+			this.canvas.addEventListener('mouseup',function(event){ 
+				var x = event.pageX-getBodyOffsetLeft(this), 
+				y = event.pageY-getBodyOffsetTop(this); 
+				self.onMouseUp(event,{x:x,y:y}); 
+			},false); 
+			this.canvas.addEventListener('click',function(event){ 
+				var x = event.pageX-getBodyOffsetLeft(this), 
+				y = event.pageY-getBodyOffsetTop(this); 
+				self.onClick({x:x,y:y}); 
+			},false); 
+		}, 
+		onMouseMove:function(pos){ 
+			console.log("----onMouseMove----");
+			if(this.isButtonDown){ 
+				var p = this.toolbarspos; 
+				for(var i in p){ 
+					if(pos.x >= p[i].x 
+						&& pos.x <= p[i].x+p[i].w 
+						&& pos.y >= p[i].y 
+						&& pos.y <= p[i].y+p[i].h){ 
+						return; 
+					} 
+				} 
+				//画
+				console.log(p,pos.x,pos.y);
+				this.context.lineTo(pos.x,pos.y); 
+				this.context.stroke(); 
+				this.lastX = pos.x; 
+				this.lastY = pos.y; 
+				this.curStroker.path.push(pos); 
+			} 
+		}, 
+		onMouseDown:function(event,pos){ 
+			console.log("----onMouseDown----");
+			if(event.button == 0){ 
+			var p = this.toolbarspos; 
+			for(var i in p){ 
+				if(pos.x >= p[i].x 
+				&& pos.x <= p[i].x+p[i].w 
+				&& pos.y >= p[i].y 
+				&& pos.y <= p[i].y+p[i].h){ 
+				return; 
+				} 
+			} 
+			this.isButtonDown = true; 
+			this.lastX = pos.x; 
+			this.lastY = pos.y; 
+			this.context.beginPath(); 
+			this.context.moveTo(this.lastX,this.lastY); 
+			this.curStroker.color = this.curColor; 
+			this.curStroker.path.push(pos); 
+			} 
+		}, 
+		onMouseUp:function(event,pos){ 
+			console.log("----onMouseUp----");
+			if(event.button == 0){ 
+				var p = this.toolbarspos; 
+				for(var i in p){ 
+					if(pos.x >= p[i].x 
+						&& pos.x <= p[i].x+p[i].w 
+						&& pos.y >= p[i].y 
+						&& pos.y <= p[i].y+p[i].h){ 
+						return; 
+					} 
+				} 
+				this.isButtonDown = false; 
+				this.historyStroker.push(this.curStroker); 
+				this.curStroker = {color:this.curColor,path:[]}; 
+			} 
+		}, 
+		ResetDrawAll:function(){ 
+			console.log("----ResetDrawAll----");
+			this.context.clearRect(0,0,500,500); 
+			this.ResetDrawCentre(); 
+			this.ResetDrawToolbar(); 
+		}, 
+		ResetDrawCentre:function(){ 
+			console.log("----ResetDrawCentre----");
+			var p = this.historyStroker,p2, 
+			curColor = this.context.strokeStyle; 
+			for(var i=0; i< p.length;i++){ 
+				this.context.strokeStyle = p[i].color; 
+				this.context.beginPath(); 
+				for(var t=0; t<p[i].path.length;t++){ 
+					p2 = p[i].path[t]; 
+					if(t==0) this.context.moveTo(p2.x,p2.y); 
+					this.context.lineTo(p2.x,p2.y); 
+					this.context.stroke(); 
+				} 
+				this.context.beginPath(); 
+			} 
+			this.context.strokeStyle = curColor; 
+		}, 
+		ResetDrawToolbar:function(){ 
+			console.log("----ResetDrawToolbar----");
+			var curcolor = this.context.fillStyle; 
+			for(var i=0; i<this.option.colors.length;i++){ 
+				this.context.fillStyle = this.option.colors[i]; 
+				if(this.curColor == this.context.fillStyle){ 
+					this.context.fillRect(i*35+5,2,30,20); 
+					this.toolbarspos[i] ={x:i*35+5,y:2,w:30,h:20}; 
+				}else{ 
+					this.context.fillRect(i*35+5,5,30,20); 
+					this.toolbarspos[i] = {x:i*35+5,y:5,w:30,h:20}; 
+				} 
+				this.context.stroke(); 
+			} 
+			this.context.fillStyle = curcolor; 
+		}, 
+		onClick:function(pos){ 
+			console.log("----onClick----");
+			var p = this.toolbarspos; 
+			for(var i in p){ 
+				if(pos.x >= p[i].x 
+					&& pos.x <= p[i].x+p[i].w 
+					&& pos.y >= p[i].y 
+					&& pos.y <= p[i].y+p[i].h){ 
+					this.curColor = this.option.colors[i]; 
+					this.context.strokeStyle = this.curColor; 
+					this.ResetDrawAll(); 
+				} 
+			} 
+		} 
+	}; 
+	new Drawing('can'); 
+</script></body> 
+</html> 
