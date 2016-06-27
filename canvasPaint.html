@@ -3,19 +3,27 @@
 <html> 
 <head> 
 <meta charset="UTF-8">
-<title>canvas简单画板</title> 
+<meta name="viewport">
+<title>canvasPaint</title> 
+<meta name="viewport"content="width=device-width, initial-scale=1.0">
 <style type="text/css"> 
+body{  margin: 0px;}
 #can{ width:600px; height:500px; border:1px solid #ccc; margin-top:0px; margin-left:20px;} 
+.divbord{ border: 1px black solid;}
 </style> 
 </head> 
 <body> 
-<h2 style="padding-left:20px">canvas简单画板</h2> 
+<!--<h2 style="padding-left:20px">canvasPaint</h2>-->
+	<div class="divbord">
+		<button onclick="canvasPaint.ClearAll()">清除</button>
+		<button onclick="canvasPaint.DrawHistoryData()">加载数据</button>
+	</div>
 <canvas id="can" width="600" height="500"></canvas> 
+<script src = "https://cdn.wilddog.com/js/client/current/wilddog.js" ></script> 
 <script type="text/javascript"> 
 
 	var historyData = {};    //历史数据,格式: {color:'#000000',coordinate:{'1-1','2-2','3-3','4-4'}};
-	
-
+	 
 	function getBodyOffsetTop(el){ 
 		var top = 0; 
 		do{ 
@@ -36,14 +44,14 @@
 			throw new Error(100,'do not support canvas!'); 
 		} 
 		this.option = { 
-			colors:['#000000','#ff0000','#00ff00','#0000ff','#00ffff','#7fef02','#4488bb']  //颜色
+			colors:['#000000','#ff0000','#00ff00'] //colors:['#000000','#ff0000','#00ff00','#0000ff','#00ffff','#7fef02','#4488bb']  //颜色
 		}; 
 		this.setOption(options); 
 		this.init(canvas); 
 	} 
 	Drawing.prototype = { 
 		setOption:function(options){ 
-			console.log("----setOption----");
+			//console.log("----setOption----");
 			typeof options == 'object' || (options = {}); 
 			for(var i in options){ 
 				switch(i){ 
@@ -54,7 +62,7 @@
 			} 
 		}, 
 		init:function(canvas){ 
-			console.log("----init----");
+			//console.log("----init----");
 			this.canvas = canvas; 
 			this.context = canvas.getContext('2d'); 
 			this.context.lineWidth = 1; 
@@ -71,7 +79,7 @@
 			this.ResetDrawToolbar(); 
 		}, 
 		bindEvent:function(){ 
-			console.log("----bindEvent----");
+			//console.log("----bindEvent----");
 			var self = this; 
 			this.canvas.addEventListener('mousemove',function(event){ 
 				var x = event.pageX-getBodyOffsetLeft(this), 
@@ -88,14 +96,50 @@
 				y = event.pageY-getBodyOffsetTop(this); 
 				self.onMouseUp(event,{x:x,y:y}); 
 			},false); 
-			this.canvas.addEventListener('click',function(event){ 
-				var x = event.pageX-getBodyOffsetLeft(this), 
-				y = event.pageY-getBodyOffsetTop(this); 
-				self.onClick({x:x,y:y}); 
+			//手机
+			this.canvas.addEventListener('touchmove',function(event){ 
+				var x,y;
+				if(isTouch(event)){
+					 x = event.touches[0].pageX;
+					 y = event.touches[0].pageY;
+				}else{
+					 x = event.pageX-getBodyOffsetLeft(this), 
+					 y = event.pageY-getBodyOffsetTop(this); 
+				}
+				self.onMouseMove({x:x,y:y}); 
 			},false); 
+			this.canvas.addEventListener('touchstart',function(event){ 
+				var x,y;
+				if(isTouch(event)){
+					 x = event.touches[0].pageX;
+					 y = event.touches[0].pageY;
+				}else{
+					 x = event.pageX-getBodyOffsetLeft(this), 
+					 y = event.pageY-getBodyOffsetTop(this); 
+				}
+				self.onMouseDown(event,{x:x,y:y}); 
+			},false); 
+			this.canvas.addEventListener('touchend',function(event){ 
+			    console.log(event);
+				var x,y;
+				if(isTouch(event)){
+					console.log(event.touches[0]);
+					 x = event.touches[0].pageX;
+					 y = event.touches[0].pageY;
+				}else{
+					 x = event.pageX-getBodyOffsetLeft(this), 
+					 y = event.pageY-getBodyOffsetTop(this); 
+				}
+				self.onMouseUp(event,{x:x,y:y}); 
+			},false); 
+			//this.canvas.addEventListener('click',function(event){ 
+			//	var x = event.pageX-getBodyOffsetLeft(this), 
+			//	y = event.pageY-getBodyOffsetTop(this); 
+			//	self.onClick({x:x,y:y}); 
+			//},false); 
 		}, 
 		onMouseMove:function(pos){ 
-			console.log("----onMouseMove----");
+			//console.log("----onMouseMove----");
 			if(this.isButtonDown){ 
 				var p = this.toolbarspos; 
 				for(var i in p){ 
@@ -106,8 +150,6 @@
 						return; 
 					} 
 				} 
-				//画
-				console.log(p,pos.x,pos.y);
 				this.context.lineTo(pos.x,pos.y); 
 				this.context.stroke(); 
 				this.lastX = pos.x; 
@@ -116,28 +158,28 @@
 			} 
 		}, 
 		onMouseDown:function(event,pos){ 
-			console.log("----onMouseDown----");
+			//console.log("----onMouseDown----");
 			if(event.button == 0){ 
-			var p = this.toolbarspos; 
-			for(var i in p){ 
-				if(pos.x >= p[i].x 
-				&& pos.x <= p[i].x+p[i].w 
-				&& pos.y >= p[i].y 
-				&& pos.y <= p[i].y+p[i].h){ 
-				return; 
+				var p = this.toolbarspos; 
+				for(var i in p){ 
+					if(pos.x >= p[i].x 
+					&& pos.x <= p[i].x+p[i].w 
+					&& pos.y >= p[i].y 
+					&& pos.y <= p[i].y+p[i].h){ 
+					return; 
+					} 
 				} 
-			} 
-			this.isButtonDown = true; 
-			this.lastX = pos.x; 
-			this.lastY = pos.y; 
-			this.context.beginPath(); 
-			this.context.moveTo(this.lastX,this.lastY); 
-			this.curStroker.color = this.curColor; 
-			this.curStroker.path.push(pos); 
+				this.isButtonDown = true; 
+				this.lastX = pos.x; 
+				this.lastY = pos.y; 
+				this.context.beginPath(); 
+				this.context.moveTo(this.lastX,this.lastY); 
+				this.curStroker.color = this.curColor; 
+				this.curStroker.path.push(pos); 
 			} 
 		}, 
 		onMouseUp:function(event,pos){ 
-			console.log("----onMouseUp----");
+			//console.log("----onMouseUp----");
 			if(event.button == 0){ 
 				var p = this.toolbarspos; 
 				for(var i in p){ 
@@ -147,20 +189,21 @@
 						&& pos.y <= p[i].y+p[i].h){ 
 						return; 
 					} 
-				} 
+				} 	
 				this.isButtonDown = false; 
-				this.historyStroker.push(this.curStroker); 
+				this.historyStroker.push(this.curStroker); 				
+				sendLineData(this.curStroker);//发送笔画		
 				this.curStroker = {color:this.curColor,path:[]}; 
 			} 
 		}, 
 		ResetDrawAll:function(){ 
-			console.log("----ResetDrawAll----");
+			//console.log("----ResetDrawAll----");
 			this.context.clearRect(0,0,500,500); 
 			this.ResetDrawCentre(); 
 			this.ResetDrawToolbar(); 
 		}, 
 		ResetDrawCentre:function(){ 
-			console.log("----ResetDrawCentre----");
+			//console.log("----ResetDrawCentre----");
 			var p = this.historyStroker,p2, 
 			curColor = this.context.strokeStyle; 
 			for(var i=0; i< p.length;i++){ 
@@ -177,7 +220,7 @@
 			this.context.strokeStyle = curColor; 
 		}, 
 		ResetDrawToolbar:function(){ 
-			console.log("----ResetDrawToolbar----");
+			//console.log("----ResetDrawToolbar----");
 			var curcolor = this.context.fillStyle; 
 			for(var i=0; i<this.option.colors.length;i++){ 
 				this.context.fillStyle = this.option.colors[i]; 
@@ -188,12 +231,12 @@
 					this.context.fillRect(i*35+5,5,30,20); 
 					this.toolbarspos[i] = {x:i*35+5,y:5,w:30,h:20}; 
 				} 
-				this.context.stroke(); 
+				//this.context.stroke(); 
 			} 
 			this.context.fillStyle = curcolor; 
 		}, 
 		onClick:function(pos){ 
-			console.log("----onClick----");
+			//console.log("----onClick----");
 			var p = this.toolbarspos; 
 			for(var i in p){ 
 				if(pos.x >= p[i].x 
@@ -202,11 +245,103 @@
 					&& pos.y <= p[i].y+p[i].h){ 
 					this.curColor = this.option.colors[i]; 
 					this.context.strokeStyle = this.curColor; 
-					this.ResetDrawAll(); 
+					//this.ResetDrawAll(); 
 				} 
 			} 
-		} 
+		},
+		DrawHistoryData:function(data){
+			//console.log("----DrawHistoryData----");
+			if(data&&data.color){
+				this.context.strokeStyle = data.color;
+				var path = data.path;
+				this.context.beginPath(); 
+				for(var i=0; i< path.length;i++){
+					var pos = path[i];
+					if(i==0){
+						this.context.moveTo(pos.x, pos.y);
+					}else{
+						this.context.lineTo(pos.x, pos.y);
+					}
+					this.context.stroke(); 
+				}								
+				this.context.beginPath();
+			}		
+			this.context.moveTo(this.lastX, this.lastY);
+			this.context.strokeStyle = this.curColor;			 
+		},
+		ClearAll:function(){//清空画板
+			this.context.clearRect(0,0,600,500);
+			this.historyStroker = [];
+			this.ResetDrawToolbar(); 
+		}
 	}; 
-	new Drawing('can'); 
+	
+	function isTouch(event){
+		var type = event.type;
+		if(type.indexOf('touch')>=0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	function sendLineData(data){
+		console.log("将历史数据发送服务器");
+		historyData = data;
+		//将历史数据发送服务器
+		DBhistoryDataOld.update({Data:data},function(onComplete){
+			console.log("保存结果"+onComplete);
+		});
+	}
+	
+	var ref;	//野狗主连接   
+	var SYS_DBManager = {
+		authWithPassword : function(){
+			ref.authWithPassword({email:"583064952@qq.com",password:"583064952@qq.com"},
+				function(err,data){
+					if(err == null){
+					  console.log("auth success!");
+					} else {
+					  console.log("auth failed,msg:",err);
+					}
+					var authData = ref.getAuth(); 
+					//ref.unauth(); //注销
+					//authData = ref.getAuth();
+					//console.log(authData);
+					
+					console.log("加载用户登陆状态模块");
+					ref.child("StateData/UserLoginStatus").on("value", function(datasnapshot,error) {
+						if (error == null) {
+							console.log("有用户登陆状态发生改变！");				 
+						}else{
+							console.log(error);
+						}
+					});
+				}
+			);
+		}
+	}
+	
+	ref = new Wilddog("https://msly.wilddogio.com");
+	SYS_DBManager.authWithPassword();
+	//账号登陆
+	var DBhistoryDataOld = ref.child('TEST');
+	DBhistoryDataOld.on('value',function(snapshot,prev){
+		if(snapshot&&snapshot.val().Data){
+			var newLine = snapshot.val().Data;
+			if(historyData.color == newLine.color){
+				var historyDataOldS = historyData.path.join();
+				var newLineS = newLine.path.join();
+				if(historyDataOldS == newLineS){
+					console.log("自己画的");
+					return;
+				}
+			}
+			canvasPaint.DrawHistoryData(newLine);
+		}
+	});
+	
+	//初始化画板
+	var canvasPaint = new Drawing('can'); 
 </script></body> 
 </html> 
