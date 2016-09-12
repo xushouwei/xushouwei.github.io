@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Demo</title>
+</head>
+
+<script src="http://libs.baidu.com/jquery/1.9.1/jquery.min.js"></script>
+<script src="layer/layer.js"></script>
+<script src="https://cdn.wilddog.com/js/client/current/wilddog.js"></script> 
+
+<style>
+html{background-color:#CCCCCC; font-family:'微软雅黑'}
+</style>
+
+<body>
+<button onclick="hide()">hide</button>
+<button onclick="show()">show</button>
+页面的内容......
+.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
+.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
+</body>
+
+<style>
+	#contentDiv{height:100%;}
+	#contentHeadDiv{height:20%; min-height:100px;}
+	#userImgDiv{height:100px; width:100px;}
+	#userInfoDiv{}
+	#contentBodyDiv{height:70%;}
+	#contentbottomDiv{height:10%; min-height:50px;}
+	#friendListDiv{height:100%;overflow:auto;}
+	
+	::-webkit-scrollbar  
+	{  
+		width: 16px;  
+		height: 16px;  
+		background-color: #F5F5F5;  
+	}  
+	  
+	/*定义滚动条轨道 内阴影+圆角*/  
+	::-webkit-scrollbar-track  
+	{  
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);  
+		border-radius: 10px;  
+		background-color: #F5F5F5;  
+	}  
+	  
+	/*定义滑块 内阴影+圆角*/  
+	::-webkit-scrollbar-thumb  
+	{  
+		border-radius: 10px;  
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);  
+		background-color: #555;  
+	}
+</style>
+
+<!-- 聊天主界面 -->
+<div id="contentDiv" style="height:100%;">
+	<div id="contentHeadDiv">
+		<div>
+			<div id="userImgDiv"><img src=""></img></div>
+			<div id="userInfoDiv"></div>
+		</div>
+		<div>
+			用户信息
+		</div>
+	</div>
+	<div id="contentBodyDiv">
+		<div id="friendListDiv">
+			<button onclick="openChat(123)">用户</button>
+			用户1<br>
+			用户2<br>
+			用户3<br>
+			.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>.<br>
+
+		</div>
+	</div>
+	<div id="contentbottomDiv">
+		按钮1
+	</div>
+</div>
+
+
+<!-- 聊天窗口界面 -->
+	<div id="chatDiv">
+		<div id="chatContentDiv" style="height:300px; overflow:auto;"></div>
+		<div id="chatEditDiv" style="height:90px;">
+			<textarea id="chartTextarea" style="height:80px; width:250px;"></textarea>
+			<button onclick="send()">send</button>
+		</div>
+	</div>
+
+</body>
+
+<script>
+	var aa = layer.open({id: 'mainWin',
+				type: 1,
+				area: ['300px', '100%'],
+				offset: 'rb',
+				closeBtn: 0,
+				shade: 0,
+				title: [' ', 'height: 10px'],
+				content: $("#contentDiv")});
+				
+	//layer.close(aa);
+	
+	$("#mainWin").show();
+	
+	/* 主界面begin */
+	function show(){
+		$("#mainWin").parent().show();
+	}
+	function hide(){
+		$("#mainWin").parent().hide();
+	}
+	/* 主界面end */
+	
+	/* 子窗口begin */
+	function openChatWindow(content){
+		layer.open({id: 'chatWin',
+				type: 1,
+				area: ['350px', '450px'],
+				closeBtn: 1,
+				shade: 0,
+				title: [' ', 'height: 50px'],
+				content: $("#chatDiv")
+		});
+	}
+	
+	function setChatWindowContent(content){
+		$("#chatContentDiv").html(content);
+		$("#chatContentDiv").scrollTop($("#chatContentDiv")[0].scrollHeight);
+	}
+	
+	function appendChatWindowContent(content){
+		$("#chatContentDiv").append(content);
+		$("#chatContentDiv").scrollTop($("#chatContentDiv")[0].scrollHeight);
+	}
+	
+	/* 子窗口end */
+	
+	/* 聊天内容格初始化begin */
+	function chartFormat(content){
+		var result = "";
+		if(content && content.length>0){
+			for(var obj in content){
+				if(obj.id && uid == obj.id){
+					result += "<div class='myChart'>"
+							+ "<div>用户："+content[obj].id+"</div>"
+							+ "<div>内容："+content[obj].content+"</div>"
+							+ "<div>时间："+getLocalTime(content[obj].timestamp)+"</div>"
+							+ "</div>";
+				}else{
+					result += "<div class='otherChart'>"
+							+ "<div>用户："+content[obj].id+"</div>"
+							+ "<div>内容："+content[obj].content+"</div>"
+							+ "<div>时间："+getLocalTime(content[obj].timestamp)+"</div>"
+							+ "</div>";
+				}
+			}
+		}		
+		return result;
+	}
+	/* 聊天内容格初始化end */
+</script>
+
+<script>
+	var uid = 1466129101589297;
+
+	var ref;	//野狗主连接   
+	var SYS_DBManager = {
+		authWithPassword : function(){
+			ref.authWithPassword({email:"583064952@qq.com",password:"583064952@qq.com"},
+				function(err,data){
+					if(err == null){
+					  console.log("auth success!");
+					} else {
+					  console.log("auth failed,msg:",err);
+					}
+					var authData = ref.getAuth(); 
+					//ref.unauth(); //注销
+					//authData = ref.getAuth();
+					//console.log(authData);
+					
+					console.log("加载用户登陆状态模块");
+					ref.child("StateData/UserLoginStatus").on("value", function(datasnapshot,error) {
+						if (error == null) {
+							console.log("有用户登陆状态发生改变！");				 
+						}else{
+							console.log(error);
+						}
+					});
+				}
+			);
+		}
+	}
+	
+	ref = new Wilddog("https://msly.wilddogio.com");
+	SYS_DBManager.authWithPassword();
+
+	var DBhistoryDataOld = ref.child('DataBase/ChatData/1466129101589297');
+	DBhistoryDataOld.on('child_added',function(snapshot,prev){
+		if(snapshot&&snapshot.val().Data){
+			var data = snapshot.val().Data;			 
+			console.log("数据添加："+data);
+		}
+	});
+	
+	//打开聊天窗口并获取聊天记录数据
+	function openChat(uid){
+		var hisData = [];
+		//获取当前用户发送给目标用户信息和目标用户发送给当前用户信息
+		ref.child('DataBase/ChatData/1466129101589297/1').once("value", function(data1) {		
+			ref.child('DataBase/ChatData/1/1466129101589297').once("value", function(data2) {
+				// 执行业务处理，此回调方法只会被调用一次
+				hisData = dataIntegration(data1.val(),data2.val(),1466129101589297,1);
+				hisData.sort(function (a, b) {
+				　　return a.timestamp - b.timestamp;
+				});
+				setChatWindowContent(chartFormat(hisData));
+			})
+		})
+		
+		openChatWindow('');
+	}
+	
+	//发送数据
+	function send(){
+		var chartTextarea = $("#chartTextarea").val();
+		if(chartTextarea!=""){
+			var senTime = Math.round(new Date().getTime()/1000);
+			var result = "<div class='myChart'>"
+							+ "<div>用户："+uid+"</div>"
+							+ "<div>内容："+chartTextarea+"</div>"
+							+ "<div>时间："+senTime+"</div>"
+							+ "<div class='sending'>正在发送</div>"
+							+ "</div>";
+			appendChatWindowContent(result);
+			
+			var postsRef = ref.child('DataBase/ChatData/1/1466129101589297');
+			postsRef.push({
+				content: chartTextarea,
+				timestamp: senTime
+			},function(error){
+				if(!error){
+					$(".sending").css('display','none');
+				}
+			});
+		}else{
+			layer.msg('发送内容不能为空');
+		}
+	}
+	
+	//数据整合（数据拼接+id设置）
+	var dataIntegration=function(obj1,obj2,id1,id2){
+		var resultData = [];
+		var iTmp = 1;
+		for(var key in obj1){ 
+			obj1[key].id = id1;
+			resultData.push(obj1[key]);
+			iTmp++;
+		}
+		for(var key in obj2){
+			obj2[key].id = id2;
+			resultData.push(obj2[key]);
+			iTmp++;
+		} 
+		return resultData; 
+	}   
+	
+	//时间格式化
+	function getLocalTime(nS) {  
+		return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');  
+	}
+</script>
+
+</html>
