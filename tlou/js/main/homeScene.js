@@ -36,7 +36,9 @@ var HomeScene = {
     this.bestText.setTextBounds(0, 0, 70, 50);
     bestSprite.addChild(this.bestText);
     // rerun
-    var restartBtn = game.add.button(game.width-50, 15, 'btnRestart', this.beginGame, this);
+    var restartBtn = game.add.button(game.width-150, 15, 'btnRestart', this.beginGame, this);
+    
+    var restartBtn2 = game.add.button(game.width-50, 15, 'btnRestart', this.beginGame2, this);
     // mainarea
     var mainAreaSprite = game.add.sprite(10, 80);
     var mainAreaBackGraphics = game.add.graphics(0, 0);
@@ -48,5 +50,8 @@ var HomeScene = {
   },
   beginGame: function() {
     game.state.start('dungeon');
+  },
+  beginGame2: function() {
+    game.state.start('dungeon2');
   }
 };

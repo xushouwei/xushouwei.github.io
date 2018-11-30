@@ -1,4 +1,4 @@
-var game = new Phaser.Game(640, 360, Phaser.CANVAS, 'gamebox');
+var game = new Phaser.Game(1136, 640, Phaser.AUTO, 'gamebox');
 
 //场景库
 game.States = {};
@@ -32,10 +32,18 @@ game.States.dungeon = function() {
   this.update = Dungeon.update.bind(Dungeon);
 };
 
+//副本2 龙骨
+game.States.dungeon2 = function() {
+  this.create = Dungeon2.create.bind(Dungeon2);
+  this.update = Dungeon2.update.bind(Dungeon2);
+  this.render = Dungeon2.render.bind(Dungeon2);
+};
+
 game.state.add('boot', game.States.boot);
 game.state.add('preload', game.States.preload);
 game.state.add('login', game.States.login);
 game.state.add('home', game.States.home);
 game.state.add('dungeon', game.States.dungeon);
+game.state.add('dungeon2', game.States.dungeon2);
 //入口
 game.state.start('boot');

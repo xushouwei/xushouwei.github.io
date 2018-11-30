@@ -2,6 +2,8 @@
 var PreloadScene = {
   // 加载其他所有资源
   preload: function() {
+	//龙骨初始化
+	dragonBones.PhaserFactory.init(this.game); // Static factory init. 
     // 背景
 	game.add.image(0, 0, 'bootBg');
 	//进度条
@@ -21,7 +23,17 @@ var PreloadScene = {
     game.load.image('btnRestart', 'assets/img/btn-restart.png');
     game.load.image('btnTryagain', 'assets/img/btn-tryagain.png');
     game.load.image('ground', 'assets/img/ground.png');
+    
     //dungeon
+    game.load.json('assets/dragonBones/mecha_1502b/mecha_1502b_ske.json', 'assets/dragonBones/mecha_1502b/mecha_1502b_ske.json');
+    game.load.json('assets/dragonBones/mecha_1502b/mecha_1502b_tex.json', 'assets/dragonBones/mecha_1502b/mecha_1502b_tex.json', null);
+    game.load.image('assets/dragonBones/mecha_1502b/mecha_1502b_tex.png', 'assets/dragonBones/mecha_1502b/mecha_1502b_tex.png');
+    
+    game.load.json('assets/dragonBones/demo/demo_ske.json', 'assets/dragonBones/demo/demo_ske.json');
+    game.load.json('assets/dragonBones/demo/demo_tex.json', 'assets/dragonBones/demo/demo_tex.json');
+    game.load.image('assets/dragonBones/demo/demo_tex.png', 'assets/dragonBones/demo/demo_tex.png');
+
+//    game.cache.addImage('mecha_1502b_tex.png', 'assets/dragonBones/mecha_1502b/mecha_1502b_tex.png');
 //    game.load.image('dragon_image', 'assets/img/dragon_atlas.png');
 //    game.load.json('dragon_atlas', 'assets/json/spirit/dragon_atlas.json');
 //    game.load.atlas('atlas1', 'assets/img/dragon_atlas.png', 'assets/json/spirit/dragon_atlas.json'); 
@@ -36,6 +48,7 @@ var PreloadScene = {
 //       game.load.image('btnTryagain'+i, 'assets/img/btn-tryagain.png'+i);
 //     }
     
+    game.load.start();
   },
   fileComplete: function(progress, cacheKey, success, totalLoaded, totalFiles) {
 	// 文件加载进度
