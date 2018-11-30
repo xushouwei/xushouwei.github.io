@@ -96,7 +96,7 @@ var Mecha = /** @class */ (function () {
         
         this._demo = dragonBones.PhaserFactory.factory.buildArmatureDisplay("Armature");
         this._demo.x = 500;
-        this._demo.y = 550;
+        this._demo.y = 350;
         game.world.add(this._demo);
         this._demo.animation.fadeIn("hit", -1.0, -1, 0, Mecha.NORMAL_ANIMATION_GROUP);
     }
