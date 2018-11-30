@@ -32,6 +32,9 @@ var PreloadScene = {
     game.load.json('assets/dragonBones/demo/demo_ske.json', 'assets/dragonBones/demo/demo_ske.json');
     game.load.json('assets/dragonBones/demo/demo_tex.json', 'assets/dragonBones/demo/demo_tex.json');
     game.load.image('assets/dragonBones/demo/demo_tex.png', 'assets/dragonBones/demo/demo_tex.png');
+    game.load.json('assets/dragonBones/demo65/demo65_ske.json', 'assets/dragonBones/demo65/demo65_ske.json');
+    game.load.json('assets/dragonBones/demo65/demo65_tex.json', 'assets/dragonBones/demo65/demo65_tex.json');
+    game.load.image('assets/dragonBones/demo65/demo65_tex.png', 'assets/dragonBones/demo65/demo65_tex.png');
 
 //    game.cache.addImage('mecha_1502b_tex.png', 'assets/dragonBones/mecha_1502b/mecha_1502b_tex.png');
 //    game.load.image('dragon_image', 'assets/img/dragon_atlas.png');

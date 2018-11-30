@@ -6,9 +6,9 @@ var Dungeon2 ={
 		this.ground = game.add.tileSprite(0, game.height-180, game.width, 180, "ground",0); 
 		
 		//手柄
-		this.btnA = game.add.button(400, 200, "touch", this.spineboyUpdate, this, 2, 2, 2, 2);
+		this.btnA = game.add.button(900, 200, "touch", this.spineboyUpdate, this, 2, 2, 2, 2);
 		
-		this.btnB = game.add.sprite(500, 200, "touch",3);
+		this.btnB = game.add.sprite(1000, 200, "touch",3);
 		this.gamePad = game.add.sprite(100, 260, "touch",0);
 		this.gamePad.anchor.set(0.5);
 		this.btn = this.gamePad.addChild(game.make.sprite(0, 0, "touch",1));
@@ -29,6 +29,9 @@ var Dungeon2 ={
         //demo
         factory.parseDragonBonesData(game.cache.getItem("assets/dragonBones/demo/demo_ske.json", Phaser.Cache.JSON).data);
         factory.parseTextureAtlasData(game.cache.getItem("assets/dragonBones/demo/demo_tex.json", Phaser.Cache.JSON).data, game.cache.getImage("assets/dragonBones/demo/demo_tex.png", true).base);
+        //demo65
+        factory.parseDragonBonesData(game.cache.getItem("assets/dragonBones/demo65/demo65_ske.json", Phaser.Cache.JSON).data);
+        factory.parseTextureAtlasData(game.cache.getItem("assets/dragonBones/demo65/demo65_tex.json", Phaser.Cache.JSON).data, game.cache.getImage("assets/dragonBones/demo65/demo65_tex.png", true).base);
        
         this.robot = new Mecha();
 		
@@ -95,10 +98,21 @@ var Mecha = /** @class */ (function () {
         game.world.add(this._armature);
         
         this._demo = dragonBones.PhaserFactory.factory.buildArmatureDisplay("Armature");
-        this._demo.x = 500;
-        this._demo.y = 350;
+        this._demo.x = 450;
+        this._demo.y = 300;
         game.world.add(this._demo);
         this._demo.animation.fadeIn("hit", -1.0, -1, 0, Mecha.NORMAL_ANIMATION_GROUP);
+        
+        this._demo65 = dragonBones.PhaserFactory.factory.buildArmatureDisplay("demo65");
+        this._demo65.x = 560;
+        this._demo65.y = 340;
+        this._demo65.scale.x = 0.8;
+        this._demo65.scale.y = 0.8;
+        game.world.add(this._demo65);
+        this._demo65.animation.fadeIn("hit", -1.0, -1, 0, Mecha.NORMAL_ANIMATION_GROUP);
+        
+        this._demo65.armature.flipX = !this._demo65.armature.flipX;
+        
     }
     Mecha.prototype.move = function (dir) {
         if (this._moveDir === dir) {

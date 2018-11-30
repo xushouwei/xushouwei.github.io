@@ -36,7 +36,7 @@ var HomeScene = {
     this.bestText.setTextBounds(0, 0, 70, 50);
     bestSprite.addChild(this.bestText);
     // rerun
-    var restartBtn = game.add.button(game.width-150, 15, 'btnRestart', this.beginGame, this);
+//    var restartBtn = game.add.button(game.width-150, 15, 'btnRestart', this.beginGame, this);
     
     var restartBtn2 = game.add.button(game.width-50, 15, 'btnRestart', this.beginGame2, this);
     // mainarea
